@@ -248,3 +248,394 @@ document.querySelectorAll(".tk").forEach((card) =>
     card.style.setProperty("--my", `${event.clientY - rect.top}px`);
   }),
 );
+
+/* Overview figure: one decision model, queried three ways */
+(() => {
+  const fig = document.querySelector("[data-ov]");
+  if (!fig) return;
+  const stage = fig.querySelector("[data-ov-stage]");
+  const svg = fig.querySelector("[data-ov-wires]");
+  const core = fig.querySelector("[data-ov-core]");
+  const slots = Object.fromEntries([...fig.querySelectorAll("[data-slot]")].map((el) => [el.dataset.slot, el]));
+  const tabs = [...fig.querySelectorAll("[data-ov-role]")];
+  const playButton = fig.querySelector("[data-ov-play]");
+  const roles = ["actor", "judge", "teacher"];
+  const cards = Object.fromEntries(roles.map((r) => [r, [...fig.querySelectorAll(`[data-ov-card="${r}"]`)]]));
+  const anchor = (key) => fig.querySelector(`[data-ov-a="${key}"]`);
+  const judgeIn = cards.judge[0];
+  const cells = [...fig.querySelectorAll("[data-cell]")];
+  const scores = [...cards.teacher[1].querySelectorAll("output[data-v]")];
+  const NS = "http://www.w3.org/2000/svg";
+
+  fig.querySelectorAll(".kids").forEach((list) =>
+    [...list.children].forEach((child, i) => child.style.setProperty("--i", i)),
+  );
+
+  /* ---------- Wires: an SVG overlay routed between live element boxes ---------- */
+  let wires = {};
+  const shown = (el) => el.getClientRects().length > 0;
+  function box(el) {
+    const r = el.getBoundingClientRect();
+    const s = stage.getBoundingClientRect();
+    const l = r.left - s.left;
+    const t = r.top - s.top;
+    return { l, t, r: l + r.width, b: t + r.height, cx: l + r.width / 2, cy: t + r.height / 2 };
+  }
+  function routes() {
+    const out = {};
+    const c = box(core);
+    const gut = parseFloat(getComputedStyle(fig).getPropertyValue("--gut")) || 30;
+    roles.forEach((role) => {
+      const [input, output] = cards[role];
+      if (!shown(input)) return;
+      const i = box(input);
+      const o = box(output);
+      out[`${role}-in`] = [role, [[i.cx, i.b], [i.cx, c.t]]];
+      out[`${role}-out`] = [role, [[o.cx, c.b], [o.cx, o.t]]];
+    });
+    if (shown(cards.actor[0])) {
+      const obs = box(anchor("obs"));
+      const res = box(anchor("actor-res"));
+      const x = box(cards.actor[0]).l - gut * 0.55;
+      out["actor-loop"] = ["actor", [[res.l, res.cy], [x, res.cy], [x, obs.cy], [obs.l, obs.cy]]];
+    }
+    if (shown(cards.teacher[0])) {
+      const right = box(cards.teacher[0]).r;
+      const roll = box(anchor("rollouts"));
+      const merge = box(anchor("merge"));
+      const grpo = box(anchor("grpo"));
+      const policy = box(anchor("policy"));
+      const x1 = right + gut * 0.3;
+      const x2 = right + gut * 0.62;
+      out["teacher-adv"] = ["teacher", [[roll.r, roll.cy], [x1, roll.cy], [x1, merge.cy], [merge.r, merge.cy]]];
+      out["teacher-loop"] = ["teacher", [[grpo.r, grpo.cy], [x2, grpo.cy], [x2, policy.cy], [policy.r, policy.cy]]];
+    }
+    return out;
+  }
+  function pathData(pts, radius = 12) {
+    let d = `M${pts[0][0]},${pts[0][1]}`;
+    for (let i = 1; i < pts.length - 1; i++) {
+      const [x0, y0] = pts[i - 1];
+      const [x1, y1] = pts[i];
+      const [x2, y2] = pts[i + 1];
+      const l1 = Math.hypot(x1 - x0, y1 - y0) || 1;
+      const l2 = Math.hypot(x2 - x1, y2 - y1) || 1;
+      const k = Math.min(radius, l1 / 2, l2 / 2);
+      d += ` L${x1 + ((x0 - x1) / l1) * k},${y1 + ((y0 - y1) / l1) * k}`;
+      d += ` Q${x1},${y1} ${x1 + ((x2 - x1) / l2) * k},${y1 + ((y2 - y1) / l2) * k}`;
+    }
+    const [lx, ly] = pts[pts.length - 1];
+    return `${d} L${lx},${ly}`;
+  }
+  const make = (tag, attrs) => {
+    const el = document.createElementNS(NS, tag);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    return el;
+  };
+  function drawWires() {
+    const keep = Object.fromEntries(Object.entries(wires).map(([id, w]) => [id, w.g.getAttribute("class")]));
+    svg.replaceChildren();
+    const defs = make("defs", {});
+    roles.forEach((role) => {
+      const marker = make("marker", {
+        id: `ov-arrow-${role}`,
+        markerWidth: 9,
+        markerHeight: 9,
+        refX: 8,
+        refY: 4.5,
+        orient: "auto",
+        markerUnits: "userSpaceOnUse",
+      });
+      marker.append(make("path", { d: "M0,0.5 L9,4.5 L0,8.5 z", style: `fill: var(--${role})` }));
+      defs.append(marker);
+    });
+    svg.append(defs);
+    wires = {};
+    Object.entries(routes()).forEach(([id, [role, pts]]) => {
+      const d = pathData(pts);
+      const g = make("g", { style: `--wc: var(--${role})`, "data-role": role });
+      const base = make("path", { class: "base", d, "marker-end": `url(#ov-arrow-${role})` });
+      const flow = make("path", { class: "flow", d });
+      const dot = make("circle", { class: "dot", r: 4.5, cx: pts[0][0], cy: pts[0][1] });
+      g.append(base, flow, dot);
+      svg.append(g);
+      const len = flow.getTotalLength();
+      flow.style.strokeDasharray = `${len} ${len}`;
+      flow.style.strokeDashoffset = keep[id]?.includes("done") ? 0 : len;
+      if (keep[id]) g.setAttribute("class", keep[id]);
+      wires[id] = { g, flow, dot, len, role };
+    });
+    markWires();
+  }
+  function markWires() {
+    Object.values(wires).forEach((w) => w.g.classList.toggle("on", w.role === roles[roleIndex]));
+  }
+  const ease = (t) => 1 - Math.pow(1 - t, 3);
+  function flow(id, ms) {
+    const run = token;
+    const start = performance.now();
+    return new Promise((resolve) => {
+      function frame(now) {
+        const w = wires[id];
+        if (run !== token || !w) return resolve();
+        const t = Math.min(1, (now - start) / ms);
+        const at = w.len * ease(t);
+        const p = w.flow.getPointAtLength(at);
+        w.flow.style.strokeDashoffset = w.len - at;
+        w.dot.setAttribute("cx", p.x);
+        w.dot.setAttribute("cy", p.y);
+        w.g.classList.add("live");
+        if (t < 1) return requestAnimationFrame(frame);
+        w.g.classList.remove("live");
+        w.g.classList.add("done");
+        resolve();
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+  function clearWires(role) {
+    Object.values(wires).forEach((w) => {
+      if (role && w.role !== role) return;
+      w.g.classList.remove("live", "done");
+      w.flow.style.strokeDashoffset = w.len;
+    });
+  }
+
+  /* ---------- Small effects ---------- */
+  const lit = (role, n) =>
+    cards[role].forEach((card) => card.querySelectorAll(`[data-step="${n}"]`).forEach((el) => el.classList.add("lit")));
+  function bump(el) {
+    el.classList.remove("bump");
+    void el.offsetWidth;
+    el.classList.add("bump");
+  }
+  const slotText = {
+    actor: ["What should the next action be?", "goal + history + observation", "probability per action"],
+    teacher: ["Did this action help?", "Hindsight: the whole rollout", "a score for every action"],
+  };
+  function setSlots([q, c, o]) {
+    [
+      [slots.q, q],
+      [slots.c, c],
+      [slots.o, o],
+    ].forEach(([el, text]) => {
+      el.classList.add("set");
+      if (el.textContent === text) return;
+      el.textContent = text;
+      el.classList.remove("swap");
+      void el.offsetWidth;
+      el.classList.add("swap");
+    });
+  }
+  function think(role, text) {
+    core.style.setProperty("--rc", `var(--${role})`);
+    setSlots(text || slotText[role]);
+    core.classList.remove("busy");
+    void core.offsetWidth;
+    core.classList.add("busy");
+  }
+  const combos = [
+    ["prefix", "value"],
+    ["prefix", "progress"],
+    ["hindsight", "value"],
+    ["hindsight", "progress"],
+  ];
+  function judgeText([ctx, q]) {
+    return [
+      q === "value" ? "Will the task succeed?" : "Did step 3 help?",
+      ctx === "prefix" ? "Prefix: steps 1–3" : "Hindsight: steps 1–5",
+      "score in [0, 1]",
+    ];
+  }
+  function setContext([ctx, q]) {
+    judgeIn.dataset.ctx = ctx;
+    judgeIn.dataset.q = q;
+  }
+  function hit(k) {
+    cells.forEach((cell, i) => cell.classList.toggle("cur", i === k));
+    cells[k].classList.add("hit");
+  }
+  function countScores() {
+    const run = token;
+    scores.forEach((el, i) => {
+      const target = Number(el.dataset.v);
+      const start = performance.now() + i * 70;
+      function frame(now) {
+        if (run !== token) return;
+        const t = Math.max(0, Math.min(1, (now - start) / 700));
+        el.textContent = (target * ease(t)).toFixed(2);
+        if (t < 1) requestAnimationFrame(frame);
+      }
+      el.textContent = "0.00";
+      requestAnimationFrame(frame);
+    });
+  }
+
+  /* ---------- Sequences: [duration ms, action] ---------- */
+  const idle = () => {};
+  const sequences = {
+    actor: [
+      [500, () => lit("actor", 1)],
+      [700, () => lit("actor", 2)],
+      [600, () => lit("actor", 3)],
+      [800, (ms) => flow("actor-in", ms)],
+      [900, () => think("actor")],
+      [700, (ms) => flow("actor-out", ms)],
+      [1300, () => lit("actor", 4)],
+      [900, () => lit("actor", 5)],
+      [1000, () => lit("actor", 6)],
+      [800, () => lit("actor", 7)],
+      [1300, (ms) => flow("actor-loop", ms)],
+      [1800, () => bump(anchor("obs"))],
+    ],
+    judge: [
+      [900, () => {
+        setContext(combos[0]);
+        lit("judge", 1);
+      }],
+      ...combos.flatMap((cq, k) => [
+        [450, () => setContext(cq)],
+        [550, (ms) => flow("judge-in", ms)],
+        [450, () => think("judge", judgeText(cq))],
+        [500, (ms) => flow("judge-out", ms)],
+        [k === 3 ? 900 : 650, () => hit(k)],
+      ]),
+      [2000, () => lit("judge", 2)],
+    ],
+    teacher: [
+      [600, () => bump(anchor("policy"))],
+      [1200, () => lit("teacher", 2)],
+      [800, (ms) => flow("teacher-in", ms)],
+      [900, () => think("teacher")],
+      [700, (ms) => flow("teacher-out", ms)],
+      [1400, () => {
+        lit("teacher", 3);
+        countScores();
+      }],
+      [900, (ms) => flow("teacher-adv", ms)],
+      [700, () => lit("teacher", 4)],
+      [800, () => lit("teacher", 5)],
+      [1300, (ms) => flow("teacher-loop", ms)],
+      [600, () => bump(anchor("policy"))],
+      [1900, () => lit("teacher", 6)],
+    ],
+  };
+
+  /* ---------- Player ---------- */
+  let token = 0;
+  let roleIndex = 0;
+  let playing = !reduceMotion;
+  let inView = false;
+  let running = false;
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  function setActive(index, dim) {
+    roleIndex = index;
+    const role = roles[index];
+    fig.dataset.active = role;
+    fig.toggleAttribute("data-dim", dim);
+    roles.forEach((r) => cards[r].forEach((card) => card.classList.toggle("on", r === role)));
+    tabs.forEach((tab) => tab.setAttribute("aria-pressed", String(tab.dataset.ovRole === role)));
+    markWires();
+  }
+  function reset(role) {
+    cards[role].forEach((card) => {
+      card.classList.add("ov-run");
+      card.querySelectorAll(".lit").forEach((el) => el.classList.remove("lit"));
+    });
+    if (role === "judge") cells.forEach((cell) => cell.classList.remove("hit", "cur"));
+    if (role === "teacher") scores.forEach((el) => (el.textContent = el.dataset.v));
+    clearWires(role);
+  }
+  function settle(role) {
+    cards[role].forEach((card) => card.classList.remove("ov-run"));
+    cells.forEach((cell) => cell.classList.remove("cur"));
+    if (role === "judge") setContext(combos[3]);
+    if (role === "teacher") scores.forEach((el) => (el.textContent = el.dataset.v));
+    core.classList.remove("busy");
+    clearWires();
+    tabs.forEach((tab) => tab.style.setProperty("--t", 0));
+  }
+  function stop() {
+    token++;
+    running = false;
+    settle(roles[roleIndex]);
+  }
+  async function run(index) {
+    const my = ++token;
+    running = true;
+    const prev = roles[roleIndex];
+    settle(prev);
+    setActive(index, true);
+    const role = roles[index];
+    // Layout may change (one card per role on narrow screens): reroute before animating.
+    drawWires();
+    reset(role);
+    const steps = sequences[role];
+    const total = steps.reduce((sum, [ms]) => sum + ms, 0);
+    const tab = tabs[index];
+    const start = performance.now();
+    (function progressFrame(now) {
+      if (my !== token) return;
+      tab.style.setProperty("--t", Math.min(1, (now - start) / total));
+      requestAnimationFrame(progressFrame);
+    })(start);
+    for (const [ms, action] of steps) {
+      action(ms);
+      await wait(ms);
+      if (my !== token) return;
+    }
+    running = false;
+    settle(role);
+    if (playing && inView) run((index + 1) % roles.length);
+  }
+  function select(index) {
+    stop();
+    if (playing && inView) run(index);
+    else {
+      setActive(index, true);
+      drawWires();
+    }
+  }
+  function setPlaying(next) {
+    playing = next;
+    fig.toggleAttribute("data-paused", !next);
+    playButton.setAttribute("aria-label", next ? "Pause animation" : "Play animation");
+    if (next) run(roleIndex);
+    else stop();
+  }
+
+  tabs.forEach((tab, i) => tab.addEventListener("click", () => select(i)));
+  roles.forEach((role, i) =>
+    cards[role].forEach((card) =>
+      card.addEventListener("click", () => {
+        if (roleIndex !== i || !running) select(i);
+      }),
+    ),
+  );
+  playButton.addEventListener("click", () => setPlaying(!playing));
+
+  new IntersectionObserver(
+    ([entry]) => {
+      inView = entry.isIntersecting;
+      if (inView && playing && !running) run(roleIndex);
+      if (!inView && running) stop();
+    },
+    { threshold: 0.3 },
+  ).observe(stage);
+
+  let queued = false;
+  new ResizeObserver(() => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      drawWires();
+    });
+  }).observe(stage);
+  document.fonts?.ready.then(drawWires);
+
+  fig.toggleAttribute("data-paused", !playing);
+  setActive(0, false);
+  drawWires();
+})();

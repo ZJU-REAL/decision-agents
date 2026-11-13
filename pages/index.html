@@ -138,20 +138,206 @@
           </p>
         </details>
 
-        <figure class="paper-figure overview reveal">
-          <a href="assets/overview.png" rel="noopener" target="_blank">
-            <img
-              alt="One decision model queried in three ways on putting a heated mug on a table. Actor chooses the next action; Judge scores a recorded action under Prefix or Hindsight context and Value or Progress question; Teacher scores policy rollouts and adds centered scores to the GRPO advantage."
-              height="1365"
-              loading="lazy"
-              src="assets/overview.png"
-              width="2142"
-            />
-          </a>
+        <figure class="paper-figure overview ov reveal" data-ov>
+          <div class="ov-stage" data-ov-stage>
+            <svg aria-hidden="true" class="ov-wires" data-ov-wires></svg>
+
+            <!-- Inputs -->
+            <div class="ov-card ov-in actor" data-ov-card="actor">
+              <h3 class="ov-title">Actor</h3>
+              <div class="ov-obs" data-ov-a="obs" data-step="1">
+                <b>Observation:</b> <i>at the table, holding an unheated mug.</i>
+              </div>
+              <p class="ov-label">Available actions</p>
+              <ul class="ov-options kids" data-step="2">
+                <li><kbd>A</kbd><code>place mug on table</code></li>
+                <li><kbd>B</kbd><code>go to microwave</code></li>
+                <li><kbd>C</kbd><code>look</code></li>
+              </ul>
+              <p class="ov-ask" data-step="3">What should the next action be?</p>
+            </div>
+
+            <div class="ov-card ov-in judge" data-ctx="hindsight" data-ov-card="judge" data-q="progress">
+              <h3 class="ov-title">Judge</h3>
+              <ol class="ov-traj kids" data-step="1">
+                <li><code>place unheated mug on table</code><em>too early</em></li>
+                <li><code>take mug from counter</code><em>no-op</em></li>
+                <li class="target"><code>take mug back from table</code><em>target</em></li>
+                <li class="late"><code>… heat mug …</code><em>milestone</em></li>
+                <li class="late"><code>place heated mug on table</code><em>goal met</em></li>
+              </ol>
+              <div class="ov-cq">
+                <div class="ov-axis">
+                  <h4>Context</h4>
+                  <p data-ctx="prefix"><b>Prefix</b><span class="nums"><i>1</i><i>2</i><i>3</i></span></p>
+                  <p data-ctx="hindsight"><b>Hindsight</b><span class="nums"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i></span></p>
+                </div>
+                <div class="ov-axis">
+                  <h4>Question</h4>
+                  <p data-q="progress"><b>Progress:</b> Did this action help?</p>
+                  <p data-q="value"><b>Value:</b> Will the task succeed?</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="ov-card ov-in teacher" data-ov-card="teacher">
+              <h3 class="ov-title">Teacher</h3>
+              <div class="ov-policy" data-ov-a="policy">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="3.5" /><path d="M12 8V5" /><circle cx="12" cy="4" r="1.3" /><circle class="eye" cx="9.5" cy="13" r="1.2" /><circle class="eye" cx="14.5" cy="13" r="1.2" /></svg>
+                Policy
+              </div>
+              <div class="ov-rollouts" data-ov-a="rollouts">
+                <p class="ov-label">Policy rollouts</p>
+                <div class="ov-grid kids" data-step="2">
+                  <span class="rn">1</span>
+                  <code>take mug</code>
+                  <code class="noop">take again<small>no-op</small></code>
+                  <code class="mile">heat mug<small>milestone</small></code>
+                  <code>place ✓</code>
+                  <span class="rn">2</span>
+                  <code>place cold mug</code>
+                  <code class="fix">take mug back<small>repair</small></code>
+                  <code>heat mug</code>
+                  <code>place ✓</code>
+                </div>
+              </div>
+            </div>
+
+            <!-- Decision-model family -->
+            <div class="ov-core" data-ov-core>
+              <h3 class="ov-core-title">Decision-model family</h3>
+              <div class="ov-family">
+                <div class="fam left">
+                  <ul>
+                    <li><b>Decider v1.2</b><small>full fine-tuning</small></li>
+                    <li><b>Qwen prompted</b><small>prompting</small></li>
+                    <li><b>Qwen constrained</b><small>constrained readout</small></li>
+                  </ul>
+                  <span class="base">Qwen3.8-27B</span>
+                </div>
+                <div class="jev" data-ov-a="jev"><b>JEV</b><small>followed through all three roles</small></div>
+                <div class="fam right">
+                  <span class="base">GPT-6 Luna</span>
+                  <ul>
+                    <li><b>GPT Decisions</b><small>undisclosed</small></li>
+                    <li><b>GPT Luna</b><small>prompting</small></li>
+                  </ul>
+                </div>
+              </div>
+              <p class="ov-formula" aria-live="polite">
+                <span class="lead">Decision model:</span>
+                <span class="slot" data-slot="q">question</span>
+                <span class="op">+</span>
+                <span class="slot" data-slot="c">context</span>
+                <span class="op">→</span>
+                <span class="slot" data-slot="o">choice / probabilities</span>
+              </p>
+            </div>
+
+            <!-- Outputs -->
+            <div class="ov-card ov-out actor" data-ov-card="actor">
+              <div class="ov-tree">
+                <div class="br a">
+                  <span class="node pick" data-step="4">
+                    <span class="nl">A <em>chosen</em></span>
+                    <span class="pbar"><i style="--p: 63.8"></i></span><output>0.64</output>
+                  </span>
+                  <span class="wire" data-step="5"></span>
+                  <code class="node" data-step="5">place mug on table</code>
+                  <span class="res bad" data-ov-a="actor-res" data-step="6">placed ✓ heated ✗</span>
+                </div>
+                <div class="br b">
+                  <span class="node" data-step="4">
+                    <span class="nl">B</span>
+                    <span class="pbar"><i style="--p: 14.6"></i></span><output>0.15</output>
+                  </span>
+                  <span class="wire ghost" data-step="6"></span>
+                  <code class="node" data-step="6">go to microwave</code>
+                  <code class="node" data-step="6">heat mug</code>
+                  <code class="node" data-step="6">place mug on table</code>
+                  <span class="res good" data-step="6">placed ✓ heated ✓</span>
+                </div>
+              </div>
+              <p class="ov-note" data-step="7">Often favors the easier subgoal first.</p>
+              <p class="ov-fine">Probabilities: JEV’s mean over 116 such states.</p>
+            </div>
+
+            <div class="ov-card ov-out judge" data-ov-card="judge">
+              <p class="ov-pill">Target-action score</p>
+              <div class="ov-cxq">
+                <span class="hd title">Context × Question</span>
+                <span class="hd"></span>
+                <span class="hd">Value</span>
+                <span class="hd">Progress</span>
+                <span class="rh">Prefix</span>
+                <span class="cell" data-cell="0">Prefix + Value</span>
+                <span class="cell" data-cell="1">Prefix + Progress</span>
+                <span class="rh">Hindsight</span>
+                <span class="cell" data-cell="2">Hindsight + Value</span>
+                <span class="cell best" data-cell="3">✓ Hindsight + Progress</span>
+              </div>
+              <p class="ov-note" data-step="2">Asking about action contribution better scores useful actions.</p>
+              <p class="ov-note" data-step="2">Full trajectories reveal contributions missed under Prefix.</p>
+            </div>
+
+            <div class="ov-card ov-out teacher" data-ov-card="teacher">
+              <div class="ov-scores">
+                <p class="ov-label">Teacher scores</p>
+                <div class="ov-grid kids" data-step="3">
+                  <span class="rn">1</span>
+                  <output data-v="0.85">0.85</output>
+                  <output class="noop" data-v="0.07">0.07</output>
+                  <output class="mile" data-v="0.95">0.95</output>
+                  <output data-v="0.98">0.98</output>
+                  <span class="rn">2</span>
+                  <output data-v="0.10">0.10</output>
+                  <output class="fix" data-v="0.82">0.82</output>
+                  <output data-v="0.93">0.93</output>
+                  <output data-v="0.99">0.99</output>
+                </div>
+              </div>
+              <div class="ov-merge" data-step="4">
+                <span class="fx">A<sub>i,t</sub> = A<sup>out</sup><sub>i,t</sub> + λ (s<sub>i,t</sub> − s̄)</span>
+                <span class="plus" data-ov-a="merge">+</span>
+                <em>outcome advantage</em>
+              </div>
+              <div class="ov-grpo" data-ov-a="grpo" data-step="5">
+                <svg aria-hidden="true" class="scale" viewBox="0 0 32 32"><path d="M16 5v22M10 27h12" /><g class="beam"><path d="M5 10h22" /><path d="M5 10l-3.5 8h7zM27 10l-3.5 8h7z" /></g><circle cx="16" cy="5" r="1.6" /></svg>
+                GRPO updates policy
+              </div>
+              <p class="ov-note" data-step="6">Progress + Hindsight produce the strongest policy.</p>
+              <p class="ov-note" data-step="6">Models can teach tasks they struggle to solve.</p>
+            </div>
+          </div>
+
+          <div class="ov-controls">
+            <button aria-label="Pause animation" class="ov-play" data-ov-play type="button">
+              <svg aria-hidden="true" class="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" /></svg>
+              <svg aria-hidden="true" class="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" /></svg>
+            </button>
+            <div aria-label="Show one role" class="ov-tabs" role="group">
+              <button class="actor" data-ov-role="actor" type="button"><b>01</b> Actor<i></i></button>
+              <button class="judge" data-ov-role="judge" type="button"><b>02</b> Judge<i></i></button>
+              <button class="teacher" data-ov-role="teacher" type="button"><b>03</b> Teacher<i></i></button>
+            </div>
+          </div>
+
           <figcaption>
             One decision model, queried three ways. A decision model maps a <b>question + context</b> to a typed
             answer, so the same model can choose actions, judge them, or teach a policy.
           </figcaption>
+          <details class="paper-figure-details">
+            <summary>Paper figure</summary>
+            <a href="assets/overview.png" rel="noopener" target="_blank">
+              <img
+                alt="One decision model queried in three ways on putting a heated mug on a table. Actor chooses the next action; Judge scores a recorded action under Prefix or Hindsight context and Value or Progress question; Teacher scores policy rollouts and adds centered scores to the GRPO advantage."
+                height="1365"
+                loading="lazy"
+                src="assets/overview.png"
+                width="2142"
+              />
+            </a>
+          </details>
         </figure>
       </section>
 
