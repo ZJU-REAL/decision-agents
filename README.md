@@ -1,5 +1,21 @@
-<h1 align="center">Actor, Judge, or Teacher?</h1>
+<h1 align="center">
+  <img src="assets/title.svg" alt="Actor, Judge, or Teacher?" width="760">
+</h1>
 <h3 align="center">Understanding Decision Models in Long-Horizon Agents</h3>
+
+<p align="center">
+  <img src="assets/banner-cropped.png" alt="Robots acting, judging past actions, and teaching a learner" width="88%">
+</p>
+
+<p align="center">
+  Haochen Liu<sup>1,*</sup>, Qianhao Zhu<sup>1,*</sup>, Zixuan Wang<sup>1,*</sup>, Dingming Li<sup>1</sup>, Tongbo Chen<sup>1</sup><br>
+  Peng Qiu<sup>2</sup>, Yingqi Qu<sup>2</sup>, Weiming Lu<sup>1</sup>, Jun Xiao<sup>1</sup>, Yongliang Shen<sup>1,†</sup>
+</p>
+
+<p align="center">
+  <sup>1</sup>Zhejiang University &nbsp;&nbsp; <sup>2</sup>Baidu<br>
+  <sup>*</sup>Equal contribution &nbsp;&nbsp; <sup>†</sup>Corresponding author
+</p>
 
 <p align="center">
   <a href="#abstract">Abstract</a> ·
@@ -23,28 +39,24 @@ Decision models answer a question with a typed output, such as a choice among op
 We study decision models in three roles, with different questions, available context, and uses of their answers:
 
 - **Actor:** selects the next action from valid candidates using the goal, interaction history, and current observation.
-- **Judge:** scores recorded actions, varying what it is asked—whether the task will succeed (**Value**) or whether the action helped achieve the goal (**Progress**)—and what it sees: the trajectory up to the action (**Prefix**) or the whole trajectory (**Hindsight**).
-- **Teacher:** scores actions in rollouts from the policy being trained. These scores are centered within each rollout group and added to the GRPO outcome advantage. The Teacher stays fixed during training and is not queried at test time.
+- **Judge:** scores recorded actions for task success (**Value**) or goal contribution (**Progress**), using the trajectory up to the action (**Prefix**) or the full trajectory (**Hindsight**).
+- **Teacher:** scores policy rollouts; group-centered action scores augment the GRPO outcome advantage. The Teacher remains fixed during training and is not queried at test time.
 
 <p align="center">
-  <img src="assets/overview.png" alt="Decision models as Actors, Judges, and Teachers" width="100%">
+  <img src="assets/overview-rounded.svg" alt="Decision models as Actors, Judges, and Teachers" width="100%">
 </p>
 
 <a id="findings"></a>
 
 ## 📊 Findings
 
-Our analyses follow the same decision models from choosing actions, to judging recorded actions, to teaching a policy:
+Our three main findings follow decision models from acting, to judging, to teaching:
 
-1. **Actors struggle to coordinate dependent subgoals.** All six models succeed less often when subgoals must be completed in order. Removing the easier subgoal from the goal shifts their choices toward the step that must come first, showing that they can identify that step. Dependency hints and ordering examples do not consistently prevent the error.
+1. **Actor.** As Actors, decision models struggle with dependent subgoals: an easier subgoal draws them away from the subgoal that must be met first.
 
-2. **The same models give overlooked actions more credit as Judges.** On the actions examined in our Actor-to-Judge experiment, all six models assign higher mean contribution scores when they see the whole trajectory. This raises two questions: do they simply score every action highly, and what does the additional context reveal?
+2. **Judge.** The same models recognize contributions they overlook as Actors. This depends on their context and question. Seeing the whole trajectory reveals how earlier actions contribute to later goal completion. Asking whether each action helped achieve the goal distinguishes their contributions more clearly than asking whether the task will succeed, which gives similar scores to actions within a trajectory.
 
-3. **The question determines whether Judges distinguish action contributions.** With the whole trajectory held fixed, asking whether the task will succeed produces similar scores across action types. Asking whether each action helped achieve the goal yields clearer distinctions; for JEV, the within-trajectory score gap between milestone and no-op actions increases from 0.05 to 0.36.
-
-4. **The whole trajectory reveals contributions that the action history alone can obscure.** As more of the trajectory becomes visible, action rankings move further from their initial ordering. In our case study, JEV initially favors the easier subgoal, mirroring the Actor's error. Seeing the later heating steps increases its score for opening the microwave, revealing how that earlier action supports the subgoal that must be completed first.
-
-5. **These judgments can teach a policy to solve tasks the Teacher struggles to solve itself.** Using Hindsight + Progress scores during training raises the 1.5B policy's success from 72.8% to 82.9% on ALFWorld and from 56.8% to 71.4% on WebShop. The advantage is largest on tasks with dependent subgoals: the trained policy succeeds on 86.8%, although JEV succeeds on only 14.7% as an Actor. The Teacher remains fixed and is not queried at test time.
+3. **Teacher.** The judgments that best distinguish action contributions also provide the best supervision for policy learning. Scoring whether each action helped achieve the goal after seeing the whole trajectory produces the strongest policies, with the largest gains on tasks that the Actor struggles to complete. The trained policies outperform their teacher, especially on tasks it rarely completes as an Actor.
 
 <a id="main-takeaways"></a>
 

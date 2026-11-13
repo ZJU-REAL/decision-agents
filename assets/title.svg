@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="112" viewBox="0 0 1000 112" role="img" aria-labelledby="title">
+  <title id="title">Actor, Judge, or Teacher?</title>
+  <style>
+    text { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; font-weight: 700; }
+    .or { fill: #151b3b; font-size: 66px; font-style: italic; font-weight: 400; }
+    @media (prefers-color-scheme: dark) { .or { fill: #e6edf3; } }
+  </style>
+  <text x="500" y="83" text-anchor="middle" font-size="88"><tspan fill="#c39448">Actor,</tspan><tspan fill="#4d6bf3"> Judge,</tspan><tspan class="or"> or </tspan><tspan fill="#709b6a">Teacher?</tspan></text>
+</svg>

@@ -1,1 +1,779 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>Actor, Judge, or Teacher? | Decision Models in Long-Horizon Agents</title>
+    <meta
+      content="A decision model that acts poorly can still teach well. Decision models as Actors, Judges, and Teachers on ALFWorld and WebShop."
+      name="description"
+    />
+    <meta content="#fbf8f1" name="theme-color" />
+    <link href="assets/favicon.svg" rel="icon" type="image/svg+xml" />
+    <link href="style.css" rel="stylesheet" />
+    <script>
+      document.documentElement.classList.add("js");
+    </script>
+    <script defer src="script.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <div aria-hidden="true" class="progress"><i></i></div>
 
+    <header class="nav">
+      <a class="wordmark" href="#top">
+        <span aria-hidden="true" class="dots"><i></i><i></i><i></i></span>
+        Decision Agents
+      </a>
+      <nav aria-label="Main navigation">
+        <a class="nav-actor" href="#actor">Actor</a>
+        <a class="nav-judge" href="#judge">Judge</a>
+        <a class="nav-teacher" href="#teacher">Teacher</a>
+        <a href="#takeaways">Takeaways</a>
+        <a class="nav-code" href="https://github.com/ZJU-REAL/decision-agents">Code ↗</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <!-- ============================== Hero ============================== -->
+      <section class="hero" id="top">
+        <p class="eyebrow">Decision models · Long-horizon agents</p>
+        <h1>
+          <span class="t-actor">Actor,</span>
+          <span class="t-judge">Judge,</span>
+          <span class="t-or">or</span>
+          <span class="t-teacher">Teacher?</span>
+        </h1>
+        <p class="subtitle">Understanding Decision Models in Long-Horizon Agents</p>
+        <p class="authors">
+          Haochen Liu<sup>1,*</sup>, Qianhao Zhu<sup>1,*</sup>, Zixuan Wang<sup>1,*</sup>,
+          Dingming Li<sup>1</sup>, Tongbo Chen<sup>1</sup>,<br class="wide" />
+          Peng Qiu<sup>2</sup>, Yingqi Qu<sup>2</sup>, Weiming Lu<sup>1</sup>,
+          Jun Xiao<sup>1</sup>, Yongliang Shen<sup>1,†</sup>
+        </p>
+        <p class="affiliations">
+          <span><sup>1</sup>Zhejiang University</span>
+          <span><sup>2</sup>Baidu</span>
+          <span class="notes"><sup>*</sup>Equal contribution · <sup>†</sup>Corresponding author</span>
+        </p>
+        <div class="hero-links">
+          <a class="button primary" href="https://github.com/ZJU-REAL/decision-agents">
+            <svg aria-hidden="true" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38v-1.34c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.83-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" /></svg>
+            Code
+          </a>
+          <a class="button" href="#story">Read the story ↓</a>
+        </div>
+        <figure class="banner">
+          <img
+            alt="Three robots: an Actor hesitating between paths, a Judge inspecting footprints with a magnifying glass, and a Teacher explaining the path to a small learner robot."
+            height="544"
+            src="assets/banner.jpg"
+            width="2172"
+          />
+        </figure>
+      </section>
+
+      <!-- ========================= Story in one line ========================= -->
+      <section class="story wrap" id="story">
+        <p class="kicker">The story in one line</p>
+        <h2 class="thesis">
+          A decision model that <em class="hl-actor">acts poorly</em> can still
+          <em class="hl-teacher">teach well</em>.
+        </h2>
+        <p class="lede">
+          Judging an action after the episode ends reveals the consequences that acting must anticipate.
+          We follow JEV through all three roles on the same ALFWorld <strong>tasks with dependency</strong>
+          (clean, heat, or cool an object before placing it).
+        </p>
+
+        <ol class="chain" aria-label="The same tasks across three roles">
+          <li class="chain-card actor reveal">
+            <span class="role-chip">Actor</span>
+            <p class="chain-verb">fails to act</p>
+            <p class="chain-stat">14.7<small>%</small></p>
+            <p>success on tasks with dependency when JEV chooses the actions itself</p>
+          </li>
+          <li class="chain-card judge reveal">
+            <span class="role-chip">Judge</span>
+            <p class="chain-verb">judges well, if asked right</p>
+            <div class="mini-heat" role="table" aria-label="JEV mean scores by action type, Hindsight context">
+              <span role="columnheader"></span>
+              <span role="columnheader">Milestone</span>
+              <span role="columnheader">Other</span>
+              <span role="columnheader">No-op</span>
+              <span role="rowheader">Value</span>
+              <i role="cell" style="--v: 0.632">0.632</i>
+              <i role="cell" style="--v: 0.604">0.604</i>
+              <i role="cell" style="--v: 0.577">0.577</i>
+              <span class="pick" role="rowheader">Progress</span>
+              <i role="cell" style="--v: 0.659">0.659</i>
+              <i class="lo" role="cell" style="--v: 0.44">0.440</i>
+              <i class="lo" role="cell" style="--v: 0.298">0.298</i>
+            </div>
+            <p class="chain-judge-note">Only the <b>Progress</b> question separates milestones from no-ops.</p>
+          </li>
+          <li class="chain-card teacher reveal">
+            <span class="role-chip">Teacher</span>
+            <p class="chain-verb">teaches what it can’t do</p>
+            <p class="chain-stat">86.8<small>%</small></p>
+            <p>success on the same tasks for a 1.5B policy trained with JEV’s scores</p>
+          </li>
+        </ol>
+
+        <details class="abstract">
+          <summary>Abstract</summary>
+          <p>
+            Decision models answer a question with a typed output, such as a choice among options with a
+            probability for each, so one model can choose an agent's actions, judge actions already taken, or
+            score every action to teach a policy with reinforcement learning. They have been evaluated mainly as
+            actors, where they often fail. We study three decision models and three general LLMs given the same
+            questions in all three roles on ALFWorld and WebShop. Our results suggest that a decision model that
+            acts poorly can still teach well, because judging an action after the episode ends reveals the
+            consequences that acting must anticipate. As actors, all six models are pulled away from a subgoal
+            that must come first by an easier one. As judges that see the whole trajectory and are asked whether
+            each action helped, the same models credit the actions that repair such mistakes, whereas asking
+            whether the task will succeed gives every action nearly the same score. Used this way as a teacher,
+            JEV raises a Qwen2.5-1.5B-Instruct policy over GRPO from 72.8% to 82.9% success on ALFWorld and from
+            56.8% to 71.4% on WebShop, with the largest gains on the tasks that JEV rarely completes as an actor.
+          </p>
+        </details>
+
+        <figure class="paper-figure overview reveal">
+          <a href="assets/overview.png" rel="noopener" target="_blank">
+            <img
+              alt="One decision model queried in three ways on putting a heated mug on a table. Actor chooses the next action; Judge scores a recorded action under Prefix or Hindsight context and Value or Progress question; Teacher scores policy rollouts and adds centered scores to the GRPO advantage."
+              height="1365"
+              loading="lazy"
+              src="assets/overview.png"
+              width="2142"
+            />
+          </a>
+          <figcaption>
+            One decision model, queried three ways. A decision model maps a <b>question + context</b> to a typed
+            answer, so the same model can choose actions, judge them, or teach a policy.
+          </figcaption>
+        </figure>
+      </section>
+
+      <!-- ============================== Roles ============================== -->
+      <div class="roles" id="roles">
+        <div class="roles-bar">
+          <button aria-label="Previous role" class="role-arrow" data-role-step="-1" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
+          </button>
+          <div aria-label="Decision model role" class="role-tabs" role="tablist">
+            <button aria-controls="actor" class="actor" data-role-go="actor" role="tab" type="button"><b>01</b> Actor</button>
+            <button aria-controls="judge" class="judge" data-role-go="judge" role="tab" type="button"><b>02</b> Judge</button>
+            <button aria-controls="teacher" class="teacher" data-role-go="teacher" role="tab" type="button"><b>03</b> Teacher</button>
+          </div>
+          <button aria-label="Next role" class="role-arrow" data-role-step="1" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
+          </button>
+        </div>
+
+      <!-- ============================== Actor ============================== -->
+      <section class="chapter actor" id="actor" role="tabpanel">
+        <div class="wrap">
+          <header class="chapter-head reveal">
+            <span class="chapter-num">01</span>
+            <div>
+              <span class="role-chip">Actor</span>
+              <h2>Acting fails on tasks with dependency.</h2>
+            </div>
+          </header>
+
+          <p class="finding reveal">
+            As Actors, decision models struggle with dependent subgoals: an easier subgoal draws them away from
+            the subgoal that must be met first.
+          </p>
+
+          <div class="prose">
+            <p>
+              A mug must be heated before placement; two pencils (Pick2) can be placed in either order.
+              All six models succeed less often when order matters.
+            </p>
+          </div>
+
+          <figure class="card heatmap-card reveal">
+            <figcaption class="card-head">
+              <h3>Actor success on ALFWorld (%)</h3>
+              <p>Same evaluation tasks as the trained policies. Darker is better.</p>
+            </figcaption>
+            <div class="table-scroll">
+              <table class="heatmap">
+                <thead>
+                  <tr class="group-row">
+                    <th></th>
+                    <th colspan="3" scope="colgroup">No dependency</th>
+                    <th class="dep" colspan="3" scope="colgroup">With dependency</th>
+                    <th></th>
+                  </tr>
+                  <tr>
+                    <th scope="col">Actor</th>
+                    <th scope="col">Pick</th><th scope="col">Look</th><th scope="col">Pick2</th>
+                    <th class="dep" scope="col">Clean</th><th class="dep" scope="col">Heat</th><th class="dep" scope="col">Cool</th>
+                    <th scope="col">All</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="focus">
+                    <th scope="row">JEV</th>
+                    <td style="--v: 77.1">77.1</td><td style="--v: 46.2">46.2</td><td style="--v: 70.8">70.8</td>
+                    <td class="dep" style="--v: 11.1">11.1</td><td class="dep" style="--v: 18.8">18.8</td><td class="dep" style="--v: 16">16.0</td>
+                    <td class="all" style="--v: 42.9">42.9</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Decider v1.2</th>
+                    <td style="--v: 97.1">97.1</td><td style="--v: 53.8">53.8</td><td style="--v: 83.3">83.3</td>
+                    <td class="dep" style="--v: 55.6">55.6</td><td class="dep" style="--v: 18.8">18.8</td><td class="dep" style="--v: 40">40.0</td>
+                    <td class="all" style="--v: 63.6">63.6</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">GPT Decisions</th>
+                    <td style="--v: 88.6">88.6</td><td style="--v: 76.9">76.9</td><td style="--v: 62.5">62.5</td>
+                    <td class="dep" style="--v: 29.6">29.6</td><td class="dep" style="--v: 25">25.0</td><td class="dep" style="--v: 24">24.0</td>
+                    <td class="all" style="--v: 52.9">52.9</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Qwen prompted</th>
+                    <td style="--v: 77.1">77.1</td><td style="--v: 53.8">53.8</td><td style="--v: 79.2">79.2</td>
+                    <td class="dep" style="--v: 22.2">22.2</td><td class="dep" style="--v: 31.2">31.2</td><td class="dep" style="--v: 20">20.0</td>
+                    <td class="all" style="--v: 49.3">49.3</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Qwen constrained</th>
+                    <td style="--v: 77.1">77.1</td><td style="--v: 46.2">46.2</td><td style="--v: 75">75.0</td>
+                    <td class="dep" style="--v: 33.3">33.3</td><td class="dep" style="--v: 6.2">6.2</td><td class="dep" style="--v: 8">8.0</td>
+                    <td class="all" style="--v: 45">45.0</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">GPT Luna</th>
+                    <td style="--v: 77.1">77.1</td><td style="--v: 46.2">46.2</td><td style="--v: 37.5">37.5</td>
+                    <td class="dep" style="--v: 18.5">18.5</td><td class="dep" style="--v: 0">0.0</td><td class="dep" style="--v: 4">4.0</td>
+                    <td class="all" style="--v: 34.3">34.3</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </figure>
+
+          <div class="prose">
+            <p>
+              <strong>The models know the required step.</strong> We collect 116 states in which the Actor stands at
+              the destination holding an object that still needs heating, cleaning, or cooling. A single action
+              would satisfy the easier placement subgoal. We then remove that subgoal from the goal and keep
+              everything else identical.
+            </p>
+          </div>
+
+          <figure class="card mask-card reveal">
+            <figcaption class="card-head">
+              <h3>Where does JEV put its probability?</h3>
+              <p>At the destination, holding an unheated mug.</p>
+            </figcaption>
+            <div aria-label="Goal" class="segmented" data-mask-toggle role="group">
+              <button aria-pressed="true" data-goal="full" type="button">
+                <small>Full goal</small>“put a heated mug on the side table”
+              </button>
+              <button aria-pressed="false" data-goal="masked" type="button">
+                <small>Easier subgoal removed</small>“heat a mug”
+              </button>
+            </div>
+            <div class="stack" data-mask-bar>
+              <i class="seg seg-state" style="--w: 14.6"><span>14.6%</span></i>
+              <i class="seg seg-place" style="--w: 63.8"><span>63.8%</span></i>
+              <i class="seg seg-other" style="--w: 21.6"><span></span></i>
+            </div>
+            <ul class="legend">
+              <li><i class="seg-state"></i>Toward the required state change (heat)</li>
+              <li><i class="seg-place"></i>Place the mug now (easier subgoal)</li>
+              <li><i class="seg-other"></i>Other actions</li>
+            </ul>
+            <p class="mask-note" data-mask-note aria-live="polite">
+              With both subgoals in the goal, <b>63.8%</b> of the probability goes to placing the unheated mug.
+            </p>
+          </figure>
+
+          <div class="prose actor-summary">
+            <p>
+              All six Actors shift the same way. They can identify the required step when it is the only subgoal,
+              but the easier subgoal pulls probability away from it. <strong>Reminding them doesn’t fix it:</strong>
+            </p>
+          </div>
+
+          <div class="bridge">
+            <span class="bridge-line"></span>
+            <p>
+              To act correctly, the model must anticipate a consequence <em>before</em> it is visible.<br />
+              <strong>A judge looks after the consequence has happened.</strong> Can the same model credit the step it skipped?
+            </p>
+            <button class="next-role" data-role-go="judge" type="button">Next: Judge <span aria-hidden="true">→</span></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================== Judge ============================== -->
+      <section class="chapter judge" id="judge" role="tabpanel">
+        <div class="wrap">
+          <header class="chapter-head reveal">
+            <span class="chapter-num">02</span>
+            <div>
+              <span class="role-chip">Judge</span>
+              <h2>Judging works, with the right context and question.</h2>
+            </div>
+          </header>
+
+          <p class="finding reveal">
+            As Judges, the same models can recognize contributions they overlook as Actors. This depends on what
+            they see and what they are asked.
+          </p>
+
+          <div class="prose">
+            <p>
+              A Judge scores each action of a recorded trajectory with a yes/no question and returns a score in
+              [0, 1]. We vary two things, holding everything else fixed:
+            </p>
+          </div>
+
+          <div class="axes reveal">
+            <div class="axis">
+              <h3>Context <span>what it sees</span></h3>
+              <p><b>Prefix</b> the trajectory up to the action</p>
+              <p class="pick"><b>Hindsight</b> the whole trajectory</p>
+            </div>
+            <div class="axis">
+              <h3>Question <span>what it is asked</span></h3>
+              <p><b>Value</b> “Will the task succeed after this action?”</p>
+              <p class="pick"><b>Progress</b> “Did this action help achieve the goal?”</p>
+            </div>
+          </div>
+
+          <h3 class="sub">Context: Hindsight reveals what a step was for</h3>
+          <div class="prose">
+            <p>
+              On the first actions of successful continuations from the Actor’s diagnostic states, all six Judges
+              give higher contribution scores with the whole trajectory; JEV rises from <b>0.41</b> to <b>0.59</b>.
+              The case below shows why. The task requires a heated mug in a cabinet. The trajectory places the mug
+              too early (6), takes it back (7), and heats it in the microwave (8–10).
+            </p>
+          </div>
+
+          <figure class="card context-card reveal">
+            <figcaption class="card-head">
+              <h3>JEV’s Progress score per step as more of the trajectory becomes visible</h3>
+              <p>Drag the slider, or press play.</p>
+            </figcaption>
+            <div class="context-control">
+              <button aria-label="Play context reveal" class="play" data-context-play type="button">
+                <span aria-hidden="true">▶</span>
+              </button>
+              <div class="range-wrap">
+                <input
+                  aria-label="Visible context"
+                  aria-valuetext="Prefix"
+                  data-context-range
+                  max="5"
+                  min="0"
+                  step="1"
+                  type="range"
+                  value="0"
+                />
+                <ol class="ticks" aria-hidden="true">
+                  <li>Prefix</li><li>+ feedback</li><li>+ 25%</li><li>+ 50%</li><li>+ 75%</li><li>Full</li>
+                </ol>
+              </div>
+            </div>
+            <p class="context-caption" data-context-caption aria-live="polite">
+              <b>Prefix:</b> the history up to and including the action. JEV favors the premature placement, just
+              like the Actor.
+            </p>
+            <ol class="steps" data-steps>
+              <li class="step" data-scores="0.25,0.25,0.24,0.23,0.24,0.23">
+                <span class="step-n">2</span><span class="step-a">look again</span>
+                <span class="step-tag">repeat</span>
+                <span class="bar"><i style="--s: 0.25"></i></span><output>0.25</output>
+              </li>
+              <li class="step" data-scores="0.49,0.72,0.46,0.40,0.46,0.44">
+                <span class="step-n">3</span><span class="step-a">go to coffee machine</span>
+                <span class="step-tag"></span>
+                <span class="bar"><i style="--s: 0.49"></i></span><output>0.49</output>
+              </li>
+              <li class="step easy" data-scores="0.79,0.90,0.52,0.47,0.52,0.60">
+                <span class="step-n">6</span><span class="step-a">place mug in cabinet</span>
+                <span class="step-tag">too early</span>
+                <span class="bar"><i style="--s: 0.79"></i></span><output>0.79</output>
+              </li>
+              <li class="step" data-scores="0.22,0.25,0.34,0.43,0.49,0.50">
+                <span class="step-n">7</span><span class="step-a">take mug back</span>
+                <span class="step-tag">repair</span>
+                <span class="bar"><i style="--s: 0.22"></i></span><output>0.22</output>
+              </li>
+              <li class="step pre" data-scores="0.23,0.22,0.19,0.40,0.46,0.50">
+                <span class="step-n">8</span><span class="step-a">go to microwave</span>
+                <span class="step-tag">prerequisite</span>
+                <span class="bar"><i style="--s: 0.23"></i></span><output>0.23</output>
+              </li>
+              <li class="step pre key" data-scores="0.20,0.18,0.66,0.66,0.76,0.76">
+                <span class="step-n">9</span><span class="step-a">open microwave</span>
+                <span class="step-tag">prerequisite</span>
+                <span class="bar"><i style="--s: 0.20"></i></span><output>0.20</output>
+              </li>
+              <li class="step pre" data-scores="0.42,0.67,0.47,0.47,0.70,0.70">
+                <span class="step-n">10</span><span class="step-a">heat mug</span>
+                <span class="step-tag">milestone</span>
+                <span class="bar"><i style="--s: 0.42"></i></span><output>0.42</output>
+              </li>
+            </ol>
+            <details class="paper-figure-details inner">
+              <summary>Paper figure</summary>
+              <img
+                alt="Heatmap of JEV scores for steps 2, 3, 6, 7, 8, 9, and 10 under Prefix, plus feedback, plus 25, 50, 75 percent, and Full context."
+                height="498"
+                loading="lazy"
+                src="assets/judge-context.png"
+                width="1800"
+              />
+            </details>
+          </figure>
+
+          <h3 class="sub">Question: ask about the action, not the outcome</h3>
+          <div class="prose">
+            <p>
+              Seeing the consequences is not enough. With the whole trajectory visible, every action shares one
+              answer to “will the task succeed?”: the outcome. On 462 ALFWorld trajectories, we compare
+              <b>milestone</b> actions (achieve a subgoal), <b>no-op</b> actions (change nothing), and the rest.
+            </p>
+          </div>
+
+          <figure class="card question-card reveal">
+            <figcaption class="card-head">
+              <h3>JEV’s mean score by action type (Hindsight context)</h3>
+              <p>Switch the question.</p>
+            </figcaption>
+            <div aria-label="Question" class="segmented compact" data-question-toggle role="group">
+              <button aria-pressed="true" data-question="value" type="button">
+                <small>Value</small>Will the task succeed?
+              </button>
+              <button aria-pressed="false" data-question="progress" type="button">
+                <small>Progress</small>Did this action help?
+              </button>
+            </div>
+            <div class="qbars">
+              <div class="qbar milestone">
+                <span class="qlabel">Milestone</span>
+                <span class="track"><i data-q="0.632,0.659" style="--s: 0.632"></i></span>
+                <output>0.632</output>
+              </div>
+              <div class="qbar other">
+                <span class="qlabel">Other</span>
+                <span class="track"><i data-q="0.604,0.440" style="--s: 0.604"></i></span>
+                <output>0.604</output>
+              </div>
+              <div class="qbar noop">
+                <span class="qlabel">No-op</span>
+                <span class="track"><i data-q="0.577,0.298" style="--s: 0.577"></i></span>
+                <output>0.577</output>
+              </div>
+            </div>
+            <p class="gap-readout" data-gap aria-live="polite">
+              Within-trajectory gap, milestone − no-op: <b>0.05</b>. Value scores track the outcome, so every
+              action looks about the same.
+            </p>
+          </figure>
+
+          <div class="prose">
+            <p>
+              Progress also ranks more true milestones at the top of each trajectory than Value, by 8.0 to 16.0
+              points at every trajectory length. All six Judges show both effects, and the two decision models with a
+              disclosed base LLM judge more accurately than that LLM given the same question, at 28% to 43% lower
+              cost per score.
+            </p>
+          </div>
+
+          <div class="bridge">
+            <span class="bridge-line"></span>
+            <p>
+              Same model. <strong>Same context, same question.</strong><br />
+              Now point it at the rollouts of a policy being trained.
+            </p>
+            <button class="next-role" data-role-go="teacher" type="button">Next: Teacher <span aria-hidden="true">→</span></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================== Teacher ============================== -->
+      <section class="chapter teacher" id="teacher" role="tabpanel">
+        <div class="wrap">
+          <header class="chapter-head reveal">
+            <span class="chapter-num">03</span>
+            <div>
+              <span class="role-chip">Teacher</span>
+              <h2>The same judgments teach the tasks the Actor fails.</h2>
+            </div>
+          </header>
+
+          <p class="finding reveal">
+            The judgments that best distinguish action contributions also provide the most effective supervision,
+            with the largest gains on tasks that the Actor struggles to complete.
+          </p>
+
+          <div class="pipeline reveal" aria-label="Teacher training loop">
+            <div class="pipe-step">
+              <span class="pipe-k">1</span>
+              <b>Policy rolls out</b>
+              <span>Qwen2.5-1.5B samples a group of trajectories per task</span>
+            </div>
+            <div class="pipe-step hot">
+              <span class="pipe-k">2</span>
+              <b>JEV scores every action</b>
+              <span>Hindsight context<br />Progress question</span>
+            </div>
+            <div class="pipe-step">
+              <span class="pipe-k">3</span>
+              <b>GRPO update</b>
+              <span class="formula">A<sub>i,t</sub> = A<sup>out</sup><sub>i,t</sub> + λ (s<sub>i,t</sub> − s̄<sub>u</sub>)</span>
+            </div>
+          </div>
+          <p class="pipe-note">
+            Scores are centered within each rollout group (λ = 0.5). JEV stays frozen during training and is never
+            queried at test time.
+          </p>
+
+          <h3 class="sub">The query that judged best teaches best</h3>
+          <figure class="card grid-card reveal">
+            <figcaption class="card-head">
+              <h3>1.5B policy success on ALFWorld tasks with dependency (%)</h3>
+              <p>Same Context × Question grid as the Judge. Mean of three evaluation seeds.</p>
+            </figcaption>
+            <div class="qgrid" role="table" aria-label="Context by question">
+              <div class="qg-corner" role="columnheader"></div>
+              <div class="qg-col" role="columnheader">Value</div>
+              <div class="qg-col" role="columnheader">Progress</div>
+              <div class="qg-row" role="rowheader">Prefix</div>
+              <div class="qg-cell" role="cell" style="--v: 75.0">
+                <b>75.0</b><span>ALFWorld 79.0 · WebShop 67.7</span>
+              </div>
+              <div class="qg-cell" role="cell" style="--v: 79.9">
+                <b>79.9</b><span>ALFWorld 78.3 · WebShop 66.6</span>
+              </div>
+              <div class="qg-row" role="rowheader">Hindsight</div>
+              <div class="qg-cell" role="cell" style="--v: 70.6">
+                <b>70.6</b><span>ALFWorld 69.3 · WebShop 68.3</span>
+              </div>
+              <div class="qg-cell best" role="cell" style="--v: 86.8">
+                <i class="best-tag">Judge’s pick</i>
+                <b>86.8</b><span>ALFWorld 82.9 · WebShop 71.4</span>
+              </div>
+            </div>
+            <p class="grid-note">
+              Hindsight alone is not enough: paired with Value, it is the weakest setting. With only the Prefix
+              visible, the two questions perform similarly.
+            </p>
+          </figure>
+
+          <h3 class="sub">The Teacher is best exactly where the Actor is worst</h3>
+          <figure class="card versus-card reveal">
+            <div class="versus">
+              <div class="vs-side actor-side">
+                <span class="role-chip">Actor</span>
+                <p class="vs-num" data-count="14.7">14.7<small>%</small></p>
+                <p>JEV choosing the actions itself</p>
+              </div>
+              <div class="vs-mid" aria-hidden="true">
+                <span>same tasks</span>
+                <svg viewBox="0 0 120 24"><path d="M2 12h110m-10-8 10 8-10 8" /></svg>
+                <span>same model</span>
+              </div>
+              <div class="vs-side teacher-side">
+                <span class="role-chip">Teacher</span>
+                <p class="vs-num" data-count="86.8">86.8<small>%</small></p>
+                <p>1.5B policy taught by JEV</p>
+              </div>
+            </div>
+            <div class="vs-bars" aria-hidden="true">
+              <span class="vs-bar actor-bar"><i style="--w: 14.7"></i></span>
+              <span class="vs-bar teacher-bar"><i style="--w: 86.8"></i></span>
+            </div>
+            <figcaption class="vs-caption">ALFWorld tasks with dependency (Clean, Heat, Cool).</figcaption>
+          </figure>
+
+          <figure class="card mirror-card reveal">
+            <figcaption class="card-head">
+              <h3>Per task type: JEV as Actor vs. what Hindsight + Progress adds as Teacher</h3>
+              <p>Sorted by Actor success. Gains in percentage points for the 1.5B policy.</p>
+            </figcaption>
+            <div aria-label="Teacher gain baseline" class="segmented compact" data-mirror-toggle role="group">
+              <button aria-pressed="true" data-base="query" type="button">
+                <small>Gain vs.</small>strongest other query
+              </button>
+              <button aria-pressed="false" data-base="grpo" type="button">
+                <small>Gain vs.</small>outcome-only GRPO
+              </button>
+            </div>
+            <div class="mirror" role="table" aria-label="Actor success and teacher gain by task type">
+              <div class="mirror-head" role="row">
+                <span role="columnheader">Task</span>
+                <span role="columnheader" class="mh-actor">JEV as Actor</span>
+                <span role="columnheader" class="mh-gain">Teacher gain</span>
+              </div>
+              <div class="mirror-row dep" role="row" data-gain="7.4,4.4">
+                <span class="m-task" role="rowheader">Clean <i>dep.</i></span>
+                <span class="m-actor" role="cell"><i style="--w: 11.1"></i><b>11.1%</b></span>
+                <span class="m-gain" role="cell"><i style="--g: 7.4"></i><b>+7.4</b></span>
+              </div>
+              <div class="mirror-row dep" role="row" data-gain="6.7,23.0">
+                <span class="m-task" role="rowheader">Cool <i>dep.</i></span>
+                <span class="m-actor" role="cell"><i style="--w: 16"></i><b>16.0%</b></span>
+                <span class="m-gain" role="cell"><i style="--g: 6.7"></i><b>+6.7</b></span>
+              </div>
+              <div class="mirror-row dep" role="row" data-gain="6.3,11.4">
+                <span class="m-task" role="rowheader">Heat <i>dep.</i></span>
+                <span class="m-actor" role="cell"><i style="--w: 18.8"></i><b>18.8%</b></span>
+                <span class="m-gain" role="cell"><i style="--g: 6.3"></i><b>+6.3</b></span>
+              </div>
+              <div class="mirror-row" role="row" data-gain="7.7,20.7">
+                <span class="m-task" role="rowheader">Look</span>
+                <span class="m-actor" role="cell"><i style="--w: 46.2"></i><b>46.2%</b></span>
+                <span class="m-gain" role="cell"><i style="--g: 7.7"></i><b>+7.7</b></span>
+              </div>
+              <div class="mirror-row" role="row" data-gain="-8.3,11.8">
+                <span class="m-task" role="rowheader">Pick2</span>
+                <span class="m-actor" role="cell"><i style="--w: 70.8"></i><b>70.8%</b></span>
+                <span class="m-gain neg" role="cell"><i style="--g: -8.3"></i><b>−8.3</b></span>
+              </div>
+              <div class="mirror-row" role="row" data-gain="-4.7,5.2">
+                <span class="m-task" role="rowheader">Pick</span>
+                <span class="m-actor" role="cell"><i style="--w: 77.1"></i><b>77.1%</b></span>
+                <span class="m-gain neg" role="cell"><i style="--g: -4.7"></i><b>−4.7</b></span>
+              </div>
+            </div>
+            <p class="mirror-note" data-mirror-note aria-live="polite">
+              Against the best of the other three Context × Question settings, Hindsight + Progress wins on every
+              task JEV fails as an Actor, and loses on the two it handles well.
+            </p>
+          </figure>
+
+          <div class="results-grid reveal">
+            <div class="result">
+              <p class="r-label">ALFWorld · 1.5B</p>
+              <p class="r-num">72.8 <span>→</span> <b>82.9</b></p>
+              <p>GRPO → + JEV Teacher</p>
+            </div>
+            <div class="result">
+              <p class="r-label">WebShop · 1.5B</p>
+              <p class="r-num">56.8 <span>→</span> <b>71.4</b></p>
+              <p>GRPO → + JEV Teacher</p>
+            </div>
+            <div class="result">
+              <p class="r-label">7B policy</p>
+              <p class="r-num">77.6 <span>→</span> <b>83.8</b></p>
+              <p>ALFWorld; WebShop 66.1 → 73.6</p>
+            </div>
+            <div class="result">
+              <p class="r-label">Small beats large</p>
+              <p class="r-num"><b>1.5B</b> <span>&gt;</span> 7B</p>
+              <p>taught 1.5B beats 7B GRPO on both environments</p>
+            </div>
+          </div>
+          <p class="source-note">GRPO baselines are reported from GiGPO. Success rates are means over three evaluation seeds.</p>
+          <div class="bridge">
+            <span class="bridge-line"></span>
+            <button class="next-role" data-role-go="actor" type="button"><span aria-hidden="true">↺</span> Back to Actor</button>
+          </div>
+        </div>
+      </section>
+
+      </div>
+
+      <!-- ============================ Takeaways ============================ -->
+      <section class="takeaways" id="takeaways">
+        <div aria-hidden="true" class="aurora"><i></i><i></i><i></i></div>
+        <div class="wrap-wide">
+          <p class="kicker light">Main takeaways</p>
+          <blockquote class="big-quote reveal">
+            <p>
+              Don’t choose a supervisor by how well it <span class="q-actor">acts</span>.
+              Choose it by how well it <span class="q-judge">judges</span>: ask about each action, after the
+              episode ends, and it can <span class="q-teacher">teach</span> what it cannot do.
+            </p>
+          </blockquote>
+
+          <ol class="bento">
+            <li class="tk reveal" style="--c1: var(--actor); --c2: #e7c27f">
+              <span class="tk-num">01</span>
+              <span class="tk-roles"><i class="r-actor">Actor</i></span>
+              <h3>Actors know the required step but are drawn to the easier one.</h3>
+              <p>
+                General reminders don’t prevent the error. When a decision model must act, restructure the goal,
+                e.g. into ordered subgoals, rather than adding instructions to the prompt.
+              </p>
+              <div class="tk-stat"><b>14.6% → 77.6%</b><span>JEV’s probability on the required step once the easier subgoal is removed</span></div>
+            </li>
+            <li class="tk reveal" style="--c1: var(--judge); --c2: #9fb1ff">
+              <span class="tk-num">02</span>
+              <span class="tk-roles"><i class="r-judge">Judge</i></span>
+              <h3>The question sets the granularity of the signal.</h3>
+              <p>
+                Asking about the eventual outcome gives every action nearly the same score and largely repeats the
+                outcome reward. Asking about each action’s contribution separates actions within a trajectory.
+              </p>
+              <div class="tk-stat"><b>0.05 → 0.36</b><span>milestone − no-op gap, Value → Progress</span></div>
+            </li>
+            <li class="tk reveal" style="--c1: var(--judge); --c2: var(--actor)">
+              <span class="tk-num">03</span>
+              <span class="tk-roles"><i class="r-judge">Judge</i><i class="r-actor">Actor</i></span>
+              <h3>Hindsight judgments target the Actor’s own failure.</h3>
+              <p>
+                The whole trajectory reveals why prerequisite steps mattered. Use decision models to score actions
+                after an episode ends, as in RL training, not to filter actions online from the prefix.
+              </p>
+              <div class="tk-stat"><b>0.20 → 0.76</b><span>JEV’s score for “open microwave”, Prefix → Full</span></div>
+            </li>
+            <li class="tk reveal" style="--c1: var(--judge); --c2: var(--teacher)">
+              <span class="tk-num">04</span>
+              <span class="tk-roles"><i class="r-judge">Judge</i><i class="r-teacher">Teacher</i></span>
+              <h3>Screen Judges before training.</h3>
+              <p>
+                Judge measures on recorded trajectories identified the question and context that trained the best
+                policy, at a small fraction of the cost of an RL run. Choose by judging quality, not acting ability.
+              </p>
+              <div class="tk-stat"><b>42.9% → 82.9%</b><span>JEV as Actor vs. the 1.5B policy it teaches, ALFWorld</span></div>
+            </li>
+            <li class="tk reveal" style="--c1: var(--teacher); --c2: #b4d6a9">
+              <span class="tk-num">05</span>
+              <span class="tk-roles"><i class="r-teacher">Teacher</i></span>
+              <h3>Step-level supervision becomes affordable.</h3>
+              <p>
+                No step labels, no learned critic, no Teacher at test time. Decision models judge more accurately
+                and more cheaply than prompted LLMs, and a taught 1.5B policy beats a 7B one trained on outcomes alone.
+              </p>
+              <div class="tk-stat"><b>$22–30</b><span>of JEV queries per training run</span></div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- =============================== Code =============================== -->
+      <section class="code wrap" id="code">
+        <div>
+          <p class="kicker">Code</p>
+          <h2>Train a policy with a decision-model Teacher.</h2>
+          <p>
+            Decision-model interfaces (Decisions API, prompted, constrained readout), action scoring, and Teacher
+            integration with GRPO training on ALFWorld and WebShop, built on verl-agent. See the
+            <a href="https://github.com/ZJU-REAL/decision-agents#installation">installation instructions</a>.
+          </p>
+          <a class="button primary" href="https://github.com/ZJU-REAL/decision-agents">View on GitHub ↗</a>
+        </div>
+        <pre class="terminal" aria-label="Training commands"><code><span class="c"># Qwen2.5-1.5B-Instruct with a JEV Teacher</span>
+<span class="p">$</span> bash examples/decision_model/run_alfworld.sh
+<span class="p">$</span> bash examples/decision_model/run_webshop.sh</code></pre>
+      </section>
+    </main>
+
+    <footer>
+      <span aria-hidden="true" class="dots"><i></i><i></i><i></i></span>
+      Zhejiang University &amp; Baidu
+    </footer>
+  </body>
+</html>
