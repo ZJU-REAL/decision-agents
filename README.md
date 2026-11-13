@@ -18,12 +18,22 @@
 </p>
 
 <p align="center">
+  <a href="https://zjureal.com/decision-agents/">
+    <img src="https://img.shields.io/badge/Project-Page-4D6BF3?style=flat-square&amp;logo=githubpages&amp;logoColor=white" alt="Project Page">
+  </a>
+  <a href="https://arxiv.org/abs/2611.17167">
+    <img src="https://img.shields.io/badge/arXiv-2611.17167-B31B1B?style=flat-square&amp;logo=arxiv&amp;logoColor=white" alt="arXiv: 2611.17167">
+  </a>
+</p>
+
+<p align="center">
   <a href="#abstract">Abstract</a> ·
   <a href="#overview">Overview</a> ·
   <a href="#findings">Findings</a> ·
   <a href="#main-takeaways">Main Takeaways</a> ·
   <a href="#installation">Installation</a> ·
-  <a href="#training">Training</a>
+  <a href="#training">Training</a> ·
+  <a href="#citation">Citation</a>
 </p>
 
 <a id="abstract"></a>
@@ -150,3 +160,21 @@ bash examples/decision_model/run_webshop.sh     # WebShop
 Our implementation uses [verl-agent / GiGPO](https://github.com/langfengQ/verl-agent) and its underlying [veRL](https://github.com/volcengine/verl) framework. We are grateful to their developers and to the teams behind [ALFWorld](https://github.com/alfworld/alfworld) and [WebShop](https://github.com/princeton-nlp/WebShop) for releasing their work.
 
 Released under the [Apache License 2.0](LICENSE).
+
+<a id="citation"></a>
+
+## ⭐ Citation
+
+If you find this project useful, please cite our paper:
+
+```bibtex
+@misc{liu2026actorjudgeteacherunderstanding,
+  title={Actor, Judge, or Teacher? Understanding Decision Models in Long-Horizon Agents},
+  author={Haochen Liu and Qianhao Zhu and Zixuan Wang and Dingming Li and Tongbo Chen and Peng Qiu and Yingqi Qu and Weiming Lu and Jun Xiao and Yongliang Shen},
+  year={2026},
+  eprint={2611.17167},
+  archivePrefix={arXiv},
+  primaryClass={cs.AI},
+  url={https://arxiv.org/abs/2611.17167},
+}
+```
