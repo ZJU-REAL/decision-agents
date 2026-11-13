@@ -1,0 +1,498 @@
+- generic [active] [ref=f1e1]:
+  - link "Skip to content" [ref=f1e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f1e5]:
+    - link "Decision Agents" [ref=f1e6] [cursor=pointer]:
+      - /url: "#top"
+    - navigation "Main navigation" [ref=f1e11]:
+      - link "Actor" [ref=f1e12] [cursor=pointer]:
+        - /url: "#actor"
+      - link "Judge" [ref=f1e13] [cursor=pointer]:
+        - /url: "#judge"
+      - link "Teacher" [ref=f1e14] [cursor=pointer]:
+        - /url: "#teacher"
+      - link "Takeaways" [ref=f1e15] [cursor=pointer]:
+        - /url: "#takeaways"
+      - link "Code ↗" [ref=f1e16] [cursor=pointer]:
+        - /url: https://github.com/ZJU-REAL/decision-agents
+  - main [ref=f1e17]:
+    - generic [ref=f1e18]:
+      - paragraph [ref=f1e19]: Decision models · Long-horizon agents
+      - heading "Actor, Judge, or Teacher?" [level=1] [ref=f1e20]:
+        - generic [ref=f1e21]: Actor,
+        - generic [ref=f1e22]: Judge,
+        - generic [ref=f1e23]: or
+        - generic [ref=f1e24]: Teacher?
+      - paragraph [ref=f1e25]: Understanding Decision Models in Long-Horizon Agents
+      - paragraph [ref=f1e26]:
+        - text: Haochen Liu
+        - superscript [ref=f1e27]: 1,*
+        - text: ", Qianhao Zhu"
+        - superscript [ref=f1e28]: 1,*
+        - text: ", Zixuan Wang"
+        - superscript [ref=f1e29]: 1,*
+        - text: ", Dingming Li"
+        - superscript [ref=f1e30]: "1"
+        - text: ", Tongbo Chen"
+        - superscript [ref=f1e31]: "1"
+        - text: ", Peng Qiu"
+        - superscript [ref=f1e32]: "2"
+        - text: ", Yingqi Qu"
+        - superscript [ref=f1e33]: "2"
+        - text: ", Weiming Lu"
+        - superscript [ref=f1e34]: "1"
+        - text: ", Jun Xiao"
+        - superscript [ref=f1e35]: "1"
+        - text: ", Yongliang Shen"
+        - superscript [ref=f1e36]: 1,†
+      - paragraph [ref=f1e37]:
+        - generic [ref=f1e38]:
+          - superscript [ref=f1e39]: "1"
+          - text: Zhejiang University
+        - generic [ref=f1e40]:
+          - superscript [ref=f1e41]: "2"
+          - text: Baidu
+        - generic [ref=f1e42]:
+          - superscript [ref=f1e43]: "*"
+          - text: Equal contribution ·
+          - superscript [ref=f1e44]: †
+          - text: Corresponding author
+      - generic [ref=f1e45]:
+        - link "Code" [ref=f1e46] [cursor=pointer]:
+          - /url: https://github.com/ZJU-REAL/decision-agents
+        - link "Read the paper on arXiv" [ref=f1e49] [cursor=pointer]:
+          - /url: https://arxiv.org/abs/2611.17167
+          - text: Paper
+        - link "Read the story ↓" [ref=f1e52] [cursor=pointer]:
+          - /url: "#story"
+      - figure [ref=f1e53]:
+        - 'img "Three robots: an Actor hesitating between paths, a Judge inspecting footprints with a magnifying glass, and a Teacher explaining the path to a small learner robot." [ref=f1e54]'
+    - generic [ref=f1e55]:
+      - paragraph [ref=f1e56]: The story in one line
+      - heading [level=2] [ref=f1e57]:
+        - text: A decision model that
+        - emphasis [ref=f1e58]: acts poorly
+        - text: can still
+        - emphasis [ref=f1e59]: teach well
+        - text: .
+      - paragraph [ref=f1e60]:
+        - text: Judging an action after the episode ends reveals the consequences that acting must anticipate. We follow JEV through all three roles on the same ALFWorld
+        - strong [ref=f1e61]: tasks with dependency
+        - text: (clean, heat, or cool an object before placing it).
+      - list "The same tasks across three roles" [ref=f1e62]:
+        - listitem [ref=f1e63]:
+          - generic [ref=f1e64]: Actor
+          - paragraph [ref=f1e65]: fails to act
+          - paragraph [ref=f1e66]: 14.7%
+          - paragraph [ref=f1e67]: success on tasks with dependency when JEV chooses the actions itself
+          - text: →
+        - listitem [ref=f1e68]:
+          - generic [ref=f1e69]: Judge
+          - paragraph [ref=f1e70]: judges well, if asked right
+          - table "JEV mean scores by action type, Hindsight context" [ref=f1e71]:
+            - columnheader
+            - columnheader "Milestone" [ref=f1e72]
+            - columnheader "Other" [ref=f1e73]
+            - columnheader "No-op" [ref=f1e74]
+            - rowheader "Value" [ref=f1e75]
+            - cell "0.632" [ref=f1e76]
+            - cell "0.604" [ref=f1e77]
+            - cell "0.577" [ref=f1e78]
+            - rowheader "Progress" [ref=f1e79]
+            - cell "0.659" [ref=f1e80]
+            - cell "0.440" [ref=f1e81]
+            - cell "0.298" [ref=f1e82]
+          - paragraph [ref=f1e83]: Only the Progress question separates milestones from no-ops.
+          - text: →
+        - listitem [ref=f1e84]:
+          - generic [ref=f1e85]: Teacher
+          - paragraph [ref=f1e86]: teaches what it can’t do
+          - paragraph [ref=f1e87]: 86.8%
+          - paragraph [ref=f1e88]: success on the same tasks for a 1.5B policy trained with JEV’s scores
+      - group [ref=f1e89]:
+        - generic "Abstract" [ref=f1e90] [cursor=pointer]
+      - figure "One decision model, queried three ways. A decision model maps a question + context to a typed answer, so the same model can choose actions, judge them, or teach a policy." [ref=f1e91]:
+        - generic [ref=f1e92]:
+          - generic [ref=f1e93] [cursor=pointer]:
+            - heading "Actor" [level=3] [ref=f1e94]
+            - generic [ref=f1e95]: "Observation: at the table, holding an unheated mug."
+            - paragraph [ref=f1e96]: Available actions
+            - list [ref=f1e97]:
+              - listitem [ref=f1e98]:
+                - generic [ref=f1e99]: A
+                - code [ref=f1e100]: place mug on table
+              - listitem [ref=f1e101]:
+                - generic [ref=f1e102]: B
+                - code [ref=f1e103]: go to microwave
+              - listitem [ref=f1e104]:
+                - generic [ref=f1e105]: C
+                - code [ref=f1e106]: look
+            - paragraph [ref=f1e107]: What should the next action be?
+          - generic [ref=f1e108] [cursor=pointer]:
+            - heading "Judge" [level=3] [ref=f1e109]
+            - list [ref=f1e110]:
+              - listitem [ref=f1e111]:
+                - code [ref=f1e112]: place unheated mug on table
+                - emphasis [ref=f1e113]: "# too early"
+              - listitem [ref=f1e114]:
+                - code [ref=f1e115]: take mug from counter
+                - emphasis [ref=f1e116]: "# no-op"
+              - listitem [ref=f1e117]:
+                - code [ref=f1e118]: take mug back from table
+                - emphasis [ref=f1e119]: "# target"
+              - listitem [ref=f1e120]:
+                - code [ref=f1e121]: … heat mug …
+                - emphasis [ref=f1e122]: "# milestone"
+              - listitem [ref=f1e123]:
+                - code [ref=f1e124]: place heated mug on table
+                - emphasis [ref=f1e125]: "# goal met"
+            - generic [ref=f1e126]:
+              - generic [ref=f1e127]:
+                - heading "Context" [level=4] [ref=f1e128]
+                - paragraph [ref=f1e129]:
+                  - generic [ref=f1e130]: Prefix
+                  - generic [ref=f1e131]:
+                    - generic [ref=f1e132]: "1"
+                    - generic [ref=f1e133]: "2"
+                    - generic [ref=f1e134]: "3"
+                - paragraph [ref=f1e135]:
+                  - generic [ref=f1e136]: Hindsight
+                  - generic [ref=f1e137]:
+                    - generic [ref=f1e138]: "1"
+                    - generic [ref=f1e139]: "2"
+                    - generic [ref=f1e140]: "3"
+                    - generic [ref=f1e141]: "4"
+                    - generic [ref=f1e142]: "5"
+              - generic [ref=f1e143]:
+                - heading "Question" [level=4] [ref=f1e144]
+                - paragraph [ref=f1e145]:
+                  - generic [ref=f1e146]: "Progress:"
+                  - text: Did this action help?
+                - paragraph [ref=f1e147]:
+                  - generic [ref=f1e148]: "Value:"
+                  - text: Will the task succeed?
+          - generic [ref=f1e149] [cursor=pointer]:
+            - heading "Teacher" [level=3] [ref=f1e150]
+            - generic [ref=f1e151]: Policy
+            - generic [ref=f1e157]:
+              - paragraph [ref=f1e158]: Policy rollouts
+              - generic [ref=f1e159]:
+                - generic [ref=f1e160]: "1"
+                - code [ref=f1e161]: take mug
+                - code [ref=f1e162]:
+                  - text: take again
+                  - generic [ref=f1e163]: no-op
+                - code [ref=f1e164]:
+                  - text: heat mug
+                  - generic [ref=f1e165]: milestone
+                - code [ref=f1e166]: place ✓
+                - generic [ref=f1e167]: "2"
+                - code [ref=f1e168]: place cold mug
+                - code [ref=f1e169]:
+                  - text: take mug back
+                  - generic [ref=f1e170]: repair
+                - code [ref=f1e171]: heat mug
+                - code [ref=f1e172]: place ✓
+          - generic [ref=f1e173]:
+            - heading "Decision-model family" [level=3] [ref=f1e174]
+            - generic [ref=f1e175]:
+              - generic [ref=f1e176]:
+                - list [ref=f1e177]:
+                  - listitem [ref=f1e178]:
+                    - generic [ref=f1e179]: Decider v1.2
+                    - text: full fine-tuning
+                  - listitem [ref=f1e180]:
+                    - generic [ref=f1e181]: Qwen prompted
+                    - text: prompting
+                  - listitem [ref=f1e182]:
+                    - generic [ref=f1e183]: Qwen constrained
+                    - text: constrained readout
+                - generic [ref=f1e184]: Qwen3.8-27B
+              - generic [ref=f1e185]:
+                - generic [ref=f1e186]: JEV
+                - generic [ref=f1e187]: followed through all three roles
+              - generic [ref=f1e188]:
+                - generic [ref=f1e189]: GPT-6 Luna
+                - list [ref=f1e190]:
+                  - listitem [ref=f1e191]:
+                    - generic [ref=f1e192]: GPT Decisions
+                    - text: undisclosed
+                  - listitem [ref=f1e193]:
+                    - generic [ref=f1e194]: GPT Luna
+                    - text: prompting
+            - paragraph [ref=f1e195]:
+              - generic [ref=f1e196]: "Decision model:"
+              - generic [ref=f1e197]: question
+              - generic [ref=f1e198]: +
+              - generic [ref=f1e199]: context
+              - generic [ref=f1e200]: →
+              - generic [ref=f1e201]: choice / probabilities
+          - generic [ref=f1e202] [cursor=pointer]:
+            - generic [ref=f1e203]:
+              - generic [ref=f1e204]:
+                - generic [ref=f1e205]:
+                  - generic [ref=f1e206]:
+                    - text: A
+                    - emphasis [ref=f1e207]: chosen
+                  - status [ref=f1e210]: "0.64"
+                - code [ref=f1e212]: place mug on table
+                - generic [ref=f1e213]: placed ✓ heated ✗
+              - generic [ref=f1e214]:
+                - generic [ref=f1e215]:
+                  - generic [ref=f1e216]: B
+                  - status [ref=f1e219]: "0.15"
+                - code [ref=f1e221]: go to microwave
+                - code [ref=f1e222]: heat mug
+                - code [ref=f1e223]: place mug on table
+                - generic [ref=f1e224]: placed ✓ heated ✓
+            - paragraph [ref=f1e226]: Often favors the easier subgoal first.
+          - generic [ref=f1e227] [cursor=pointer]:
+            - paragraph [ref=f1e228]: Target-action score
+            - generic [ref=f1e229]:
+              - generic [ref=f1e230]: Context × Question
+              - generic [ref=f1e232]: Value
+              - generic [ref=f1e233]: Progress
+              - generic [ref=f1e234]: Prefix
+              - generic [ref=f1e235]: Prefix + Value
+              - generic [ref=f1e236]: Prefix + Progress
+              - generic [ref=f1e237]: Hindsight
+              - generic [ref=f1e238]: Hindsight + Value
+              - generic [ref=f1e239]: ✓ Hindsight + Progress
+            - generic [ref=f1e240]:
+              - paragraph [ref=f1e241]: Asking about action contribution better scores useful actions.
+              - paragraph [ref=f1e242]: Full trajectories reveal contributions missed under Prefix.
+          - generic [ref=f1e243] [cursor=pointer]:
+            - generic [ref=f1e244]:
+              - paragraph [ref=f1e245]: Teacher scores
+              - generic [ref=f1e246]:
+                - generic [ref=f1e247]: "1"
+                - status [ref=f1e248]: "0.85"
+                - status [ref=f1e249]: "0.07"
+                - status [ref=f1e250]: "0.95"
+                - status [ref=f1e251]: "0.98"
+                - generic [ref=f1e252]: "2"
+                - status [ref=f1e253]: "0.10"
+                - status [ref=f1e254]: "0.82"
+                - status [ref=f1e255]: "0.93"
+                - status [ref=f1e256]: "0.99"
+            - generic [ref=f1e257]:
+              - generic [ref=f1e258]:
+                - text: A
+                - subscript [ref=f1e259]: i,t
+                - text: = A
+                - superscript [ref=f1e260]: out
+                - subscript [ref=f1e261]: i,t
+                - text: + λ (s
+                - subscript [ref=f1e262]: i,t
+                - text: − s̄)
+              - generic [ref=f1e263]: +
+              - emphasis [ref=f1e264]: outcome advantage
+            - generic [ref=f1e265]: GRPO updates policy
+            - generic [ref=f1e271]:
+              - paragraph [ref=f1e272]: Progress + Hindsight produce the strongest policy.
+              - paragraph [ref=f1e273]: Models can teach tasks they struggle to solve.
+        - generic [ref=f1e274]:
+          - button "Pause animation" [ref=f1e275] [cursor=pointer]
+          - group "Show one role" [ref=f1e278]:
+            - button "01 Actor" [pressed] [ref=f1e279] [cursor=pointer]
+            - button "02 Judge" [ref=f1e281] [cursor=pointer]
+            - button "03 Teacher" [ref=f1e282] [cursor=pointer]
+        - group [ref=f1e284]:
+          - generic "Paper figure" [ref=f1e285] [cursor=pointer]
+    - generic [ref=f1e286]:
+      - generic [ref=f1e287]:
+        - button "Previous role" [ref=f1e288] [cursor=pointer]
+        - tablist "Decision model role" [ref=f1e291]:
+          - tab "01 Actor" [selected] [ref=f1e292] [cursor=pointer]:
+            - generic [ref=f1e293]: "01"
+            - text: Actor
+          - tab "02 Judge" [ref=f1e294] [cursor=pointer]:
+            - generic [ref=f1e295]: "02"
+            - text: Judge
+          - tab "03 Teacher" [ref=f1e296] [cursor=pointer]:
+            - generic [ref=f1e297]: "03"
+            - text: Teacher
+        - button "Next role" [ref=f1e298] [cursor=pointer]
+      - tabpanel [ref=f1e301]:
+        - generic [ref=f1e302]:
+          - generic [ref=f1e303]:
+            - generic [ref=f1e304]: "01"
+            - generic [ref=f1e305]:
+              - generic [ref=f1e306]: Actor
+              - heading "Acting fails on tasks with dependency." [level=2] [ref=f1e307]
+          - paragraph [ref=f1e308]: "As Actors, decision models struggle with dependent subgoals: an easier subgoal draws them away from the subgoal that must be met first."
+          - paragraph [ref=f1e310]: A mug must be heated before placement; two pencils (Pick2) can be placed in either order. All six models succeed less often when order matters.
+          - figure "Actor success on ALFWorld (%) Same evaluation tasks as the trained policies. Darker is better." [ref=f1e311]:
+            - generic [ref=f1e312]:
+              - heading "Actor success on ALFWorld (%)" [level=3] [ref=f1e313]
+              - paragraph [ref=f1e314]: Same evaluation tasks as the trained policies. Darker is better.
+            - table [ref=f1e316]:
+              - rowgroup [ref=f1e317]:
+                - row [ref=f1e318]:
+                  - columnheader [ref=f1e319]
+                  - columnheader "No dependency" [ref=f1e320]
+                  - columnheader "With dependency" [ref=f1e321]
+                  - columnheader [ref=f1e322]
+                - row [ref=f1e323]:
+                  - columnheader "Actor" [ref=f1e324]
+                  - columnheader "Pick" [ref=f1e325]
+                  - columnheader "Look" [ref=f1e326]
+                  - columnheader "Pick2" [ref=f1e327]
+                  - columnheader "Clean" [ref=f1e328]
+                  - columnheader "Heat" [ref=f1e329]
+                  - columnheader "Cool" [ref=f1e330]
+                  - columnheader "All" [ref=f1e331]
+              - rowgroup [ref=f1e332]:
+                - row [ref=f1e333]:
+                  - rowheader "JEVfocus" [ref=f1e334]
+                  - cell "77.1" [ref=f1e335]
+                  - cell "46.2" [ref=f1e336]
+                  - cell "70.8" [ref=f1e337]
+                  - cell "11.1" [ref=f1e338]
+                  - cell "18.8" [ref=f1e339]
+                  - cell "16.0" [ref=f1e340]
+                  - cell "42.9" [ref=f1e341]
+                - row [ref=f1e342]:
+                  - rowheader "Decider v1.2" [ref=f1e343]
+                  - cell "97.1" [ref=f1e344]
+                  - cell "53.8" [ref=f1e345]
+                  - cell "83.3" [ref=f1e346]
+                  - cell "55.6" [ref=f1e347]
+                  - cell "18.8" [ref=f1e348]
+                  - cell "40.0" [ref=f1e349]
+                  - cell "63.6" [ref=f1e350]
+                - row [ref=f1e351]:
+                  - rowheader "GPT Decisions" [ref=f1e352]
+                  - cell "88.6" [ref=f1e353]
+                  - cell "76.9" [ref=f1e354]
+                  - cell "62.5" [ref=f1e355]
+                  - cell "29.6" [ref=f1e356]
+                  - cell "25.0" [ref=f1e357]
+                  - cell "24.0" [ref=f1e358]
+                  - cell "52.9" [ref=f1e359]
+                - row [ref=f1e360]:
+                  - rowheader "Qwen prompted" [ref=f1e361]
+                  - cell "77.1" [ref=f1e362]
+                  - cell "53.8" [ref=f1e363]
+                  - cell "79.2" [ref=f1e364]
+                  - cell "22.2" [ref=f1e365]
+                  - cell "31.2" [ref=f1e366]
+                  - cell "20.0" [ref=f1e367]
+                  - cell "49.3" [ref=f1e368]
+                - row [ref=f1e369]:
+                  - rowheader "Qwen constrained" [ref=f1e370]
+                  - cell "77.1" [ref=f1e371]
+                  - cell "46.2" [ref=f1e372]
+                  - cell "75.0" [ref=f1e373]
+                  - cell "33.3" [ref=f1e374]
+                  - cell "6.2" [ref=f1e375]
+                  - cell "8.0" [ref=f1e376]
+                  - cell "45.0" [ref=f1e377]
+                - row [ref=f1e378]:
+                  - rowheader "GPT Luna" [ref=f1e379]
+                  - cell "77.1" [ref=f1e380]
+                  - cell "46.2" [ref=f1e381]
+                  - cell "37.5" [ref=f1e382]
+                  - cell "18.5" [ref=f1e383]
+                  - cell "0.0" [ref=f1e384]
+                  - cell "4.0" [ref=f1e385]
+                  - cell "34.3" [ref=f1e386]
+          - paragraph [ref=f1e388]:
+            - strong [ref=f1e389]: The models know the required step.
+            - text: We collect 116 states in which the Actor stands at the destination holding an object that still needs heating, cleaning, or cooling. A single action would satisfy the easier placement subgoal. We then remove that subgoal from the goal and keep everything else identical.
+          - figure "Where does JEV put its probability? At the destination, holding an unheated mug." [ref=f1e390]:
+            - generic [ref=f1e391]:
+              - heading "Where does JEV put its probability?" [level=3] [ref=f1e392]
+              - paragraph [ref=f1e393]: At the destination, holding an unheated mug.
+            - group "Goal" [ref=f1e394]:
+              - button "Full goal “put a heated mug on the side table”" [pressed] [ref=f1e395] [cursor=pointer]:
+                - generic [ref=f1e396]: Full goal
+                - text: “put a heated mug on the side table”
+              - button "Easier subgoal removed “heat a mug”" [ref=f1e397] [cursor=pointer]:
+                - generic [ref=f1e398]: Easier subgoal removed
+                - text: “heat a mug”
+            - generic [ref=f1e399]:
+              - generic [ref=f1e400]: 14.6%
+              - generic [ref=f1e402]: 63.8%
+            - list [ref=f1e405]:
+              - listitem [ref=f1e406]: Toward the required state change (heat)
+              - listitem [ref=f1e408]: Place the mug now (easier subgoal)
+              - listitem [ref=f1e410]: Other actions
+            - paragraph [ref=f1e412]: With both subgoals in the goal, 63.8% of the probability goes to placing the unheated mug.
+          - paragraph [ref=f1e414]:
+            - text: All six Actors shift the same way. They can identify the required step when it is the only subgoal, but the easier subgoal pulls probability away from it.
+            - strong [ref=f1e415]: "Reminding them doesn’t fix it:"
+          - generic [ref=f1e416]:
+            - paragraph [ref=f1e418]:
+              - text: To act correctly, the model must anticipate a consequence
+              - emphasis [ref=f1e419]: before
+              - text: it is visible.
+              - strong [ref=f1e420]: A judge looks after the consequence has happened.
+              - text: Can the same model credit the step it skipped?
+            - 'button "Next: Judge" [ref=f1e421] [cursor=pointer]':
+              - text: "Next: Judge"
+              - generic [aria-hidden] [ref=f1e422]: →
+      - text: → →
+    - generic [ref=f1e428]:
+      - paragraph [ref=f1e429]: Main takeaways
+      - blockquote [ref=f1e430]:
+        - paragraph [ref=f1e431]: "Don’t choose a supervisor by how well it acts. Choose it by how well it judges: ask about each action, after the episode ends, and it can teach what it cannot do."
+      - list [ref=f1e432]:
+        - listitem [ref=f1e433]:
+          - generic [ref=f1e434]: "01"
+          - generic [ref=f1e435]: Actor
+          - heading "Actors know the required step but are drawn to the easier one." [level=3] [ref=f1e437]
+          - paragraph [ref=f1e438]: General reminders don’t prevent the error. When a decision model must act, restructure the goal, e.g. into ordered subgoals, rather than adding instructions to the prompt.
+          - generic [ref=f1e439]:
+            - generic [ref=f1e440]: 14.6% → 77.6%
+            - generic [ref=f1e441]: JEV’s probability on the required step once the easier subgoal is removed
+        - listitem [ref=f1e442]:
+          - generic [ref=f1e443]: "02"
+          - generic [ref=f1e444]: Judge
+          - heading "The question sets the granularity of the signal." [level=3] [ref=f1e446]
+          - paragraph [ref=f1e447]: Asking about the eventual outcome gives every action nearly the same score and largely repeats the outcome reward. Asking about each action’s contribution separates actions within a trajectory.
+          - generic [ref=f1e448]:
+            - generic [ref=f1e449]: 0.05 → 0.36
+            - generic [ref=f1e450]: milestone − no-op gap, Value → Progress
+        - listitem [ref=f1e451]:
+          - generic [ref=f1e452]: "03"
+          - generic [ref=f1e453]:
+            - generic [ref=f1e454]: Judge
+            - generic [ref=f1e455]: Actor
+          - heading "Hindsight judgments target the Actor’s own failure." [level=3] [ref=f1e456]
+          - paragraph [ref=f1e457]: The whole trajectory reveals why prerequisite steps mattered. Use decision models to score actions after an episode ends, as in RL training, not to filter actions online from the prefix.
+          - generic [ref=f1e458]:
+            - generic [ref=f1e459]: 0.20 → 0.76
+            - generic [ref=f1e460]: JEV’s score for “open microwave”, Prefix → Full
+        - listitem [ref=f1e461]:
+          - generic [ref=f1e462]: "04"
+          - generic [ref=f1e463]:
+            - generic [ref=f1e464]: Judge
+            - generic [ref=f1e465]: Teacher
+          - heading "Screen Judges before training." [level=3] [ref=f1e466]
+          - paragraph [ref=f1e467]: Judge measures on recorded trajectories identified the question and context that trained the best policy, at a small fraction of the cost of an RL run. Choose by judging quality, not acting ability.
+          - generic [ref=f1e468]:
+            - generic [ref=f1e469]: 42.9% → 82.9%
+            - generic [ref=f1e470]: JEV as Actor vs. the 1.5B policy it teaches, ALFWorld
+        - listitem [ref=f1e471]:
+          - generic [ref=f1e472]: "05"
+          - generic [ref=f1e473]: Teacher
+          - heading "Step-level supervision becomes affordable." [level=3] [ref=f1e475]
+          - paragraph [ref=f1e476]: No step labels, no learned critic, no Teacher at test time. Decision models judge more accurately and more cheaply than prompted LLMs, and a taught 1.5B policy beats a 7B one trained on outcomes alone.
+          - generic [ref=f1e477]:
+            - generic [ref=f1e478]: $22–30
+            - generic [ref=f1e479]: of JEV queries per training run
+    - generic [ref=f1e480]:
+      - generic [ref=f1e481]:
+        - paragraph [ref=f1e482]: Code
+        - heading "Train a policy with a decision-model Teacher." [level=2] [ref=f1e483]
+        - paragraph [ref=f1e484]:
+          - text: Decision-model interfaces (Decisions API, prompted, constrained readout), action scoring, and Teacher integration with GRPO training on ALFWorld and WebShop, built on verl-agent. See the
+          - link "installation instructions" [ref=f1e485] [cursor=pointer]:
+            - /url: https://github.com/ZJU-REAL/decision-agents#installation
+          - text: .
+        - link "View on GitHub ↗" [ref=f1e486] [cursor=pointer]:
+          - /url: https://github.com/ZJU-REAL/decision-agents
+      - generic "Training commands" [ref=f1e487]:
+        - code [ref=f1e488]: "# Qwen2.5-1.5B-Instruct with a JEV Teacher $ bash examples/decision_model/run_alfworld.sh $ bash examples/decision_model/run_webshop.sh"
+  - contentinfo [ref=f1e489]: Zhejiang University & Baidu

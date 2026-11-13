@@ -252,6 +252,7 @@ sup {
 }
 .hero-links {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
   margin: 28px 0 40px;
@@ -677,9 +678,10 @@ sup {
   font-size: 12px;
 }
 .ov-traj li {
-  display: flex;
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) 73px;
   align-items: baseline;
-  gap: 8px;
+  gap: 6px;
   padding: 2px 6px;
   border-radius: 6px;
   counter-increment: t;
@@ -692,10 +694,11 @@ sup {
 }
 .ov-traj code {
   font-size: 12px;
-  white-space: nowrap;
+  white-space: normal;
 }
 .ov-traj em {
-  margin-left: auto;
+  margin-left: 0;
+  text-align: left;
   color: var(--muted);
   font: 11px var(--mono);
   white-space: nowrap;
@@ -1266,7 +1269,7 @@ sup {
 }
 .ov-merge em {
   align-self: start;
-  margin-top: -16px;
+  margin-top: -9px;
   color: var(--ci);
   font: italic 13px/1.2 var(--serif);
   white-space: nowrap;
@@ -3004,4 +3007,41 @@ footer {
 }
 .actor-summary {
   text-align: center;
+}
+
+/* Keep the output findings aligned across the three overview columns. */
+.ov-findings {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 6px;
+  flex: 0 0 128px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+.ov-findings .ov-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+.ov-findings .ov-note:only-child {
+  grid-row: 1 / -1;
+}
+.button.paper-link svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@media (max-width: 980px) {
+  .ov-findings { margin-top: 12px; flex-basis: auto; }
+}
+@media (max-width: 480px) {
+  .ov-traj li { grid-template-columns: 10px minmax(0, 1fr); }
+  .ov-traj li.target { grid-template-columns: 10px minmax(0, 1fr) 8ch; }
+}
+
+@media (min-width: 981px) and (max-width: 1200px) {
+  .ov-findings { flex-basis: 168px; }
 }
