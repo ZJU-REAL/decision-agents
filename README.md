@@ -24,6 +24,9 @@
   <a href="https://arxiv.org/abs/2611.17167">
     <img src="https://img.shields.io/badge/arXiv-2611.17167-B31B1B?style=flat-square&amp;logo=arxiv&amp;logoColor=white" alt="arXiv: 2611.17167">
   </a>
+  <a href="https://huggingface.co/papers/2611.17167">
+    <img src="https://img.shields.io/badge/HF-Papers-FFD21E?style=flat-square&amp;logo=huggingface" alt="HF Papers">
+  </a>
 </p>
 
 <p align="center">
